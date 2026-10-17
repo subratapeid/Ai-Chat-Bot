@@ -1,7 +1,10 @@
-
 import logging
 
 from dotenv import load_dotenv
+
+# Load environment variables before importing Config.
+load_dotenv()
+
 from flask import Flask
 
 from app.config import Config
@@ -11,8 +14,6 @@ from app.services.record_store import RecordStore
 
 
 def create_app():
-    load_dotenv()
-
     app = Flask(
         __name__,
         template_folder=Config.TEMPLATE_FOLDER,
@@ -21,7 +22,10 @@ def create_app():
 
     app.config.from_object(Config)
 
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    )
 
     app.register_blueprint(pages_bp)
     app.register_blueprint(chat_bp)
@@ -32,5 +36,8 @@ def create_app():
     app.logger.info("Project root: %s", app.root_path)
     app.logger.info("Template folder: %s", app.template_folder)
     app.logger.info("Static folder: %s", app.static_folder)
+    app.logger.info("Ollama URL: %s", app.config["OLLAMA_BASE_URL"])
+    app.logger.info("Ollama model: %s", app.config["OLLAMA_MODEL"])
 
     return app
+
